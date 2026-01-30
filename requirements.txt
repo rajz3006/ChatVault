@@ -1,0 +1,6 @@
+streamlit>=1.30
+chromadb>=0.4
+sentence-transformers>=2.2
+anthropic>=0.40
+requests>=2.31
+pyyaml>=6.0

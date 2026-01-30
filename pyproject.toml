@@ -1,0 +1,31 @@
+[project]
+name = "chatvault"
+version = "0.1.0"
+description = "Open-source personal AI chat history assistant with RAG"
+requires-python = ">=3.10"
+dependencies = [
+    "streamlit",
+    "chromadb",
+    "sentence-transformers",
+    "anthropic",
+    "requests",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+]
+
+[project.scripts]
+chatvault = "chatvault.app:main"
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["chatvault*"]

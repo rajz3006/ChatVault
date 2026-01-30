@@ -1,0 +1,8 @@
+[
+  {
+    "uuid": "00000000-0000-0000-0000-000000000001",
+    "full_name": "Alex TestUser",
+    "email_address": "alex.testuser@example.com",
+    "verified_phone_number": "+15555550100"
+  }
+]
