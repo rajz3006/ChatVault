@@ -7,12 +7,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query
+import httpx
+from fastapi import FastAPI, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from chatvault.config import load_config, save_config
 from chatvault.db import Database
 from chatvault.embeddings import DEFAULT_DB_PATH, DEFAULT_CHROMA_DIR, EmbeddingEngine
 from chatvault.search import SearchEngine
@@ -208,10 +210,17 @@ def get_conversation_tags(uuid: str):
 # ---------------------------------------------------------------------------
 
 @app.get("/api/search")
-def search(q: str = Query(..., min_length=1), n: int = Query(30, ge=1, le=200)):
+def search(
+    q: str = Query(..., min_length=1),
+    n: int = Query(30, ge=1, le=200),
+    mode: str = Query("hybrid", pattern="^(hybrid|keyword)$"),
+):
     try:
         engine = _get_search()
-        results = engine.hybrid_search(q, n=n)
+        if mode == "keyword":
+            results = engine.keyword_search(q, n=n)
+        else:
+            results = engine.hybrid_search(q, n=n)
         return [asdict(r) for r in results]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -304,13 +313,16 @@ def get_settings():
     try:
         available = get_available_backends()
         connectors = get_connectors()
+        cfg = load_config()
         return {
             "active_backend": _active_backend,
+            "backend": _active_backend,
+            "ollama_model": cfg.ollama_model,
             "available_backends": [type(b).__name__.replace("LLM", "").lower() for b in available],
             "connectors": [
                 {
                     "name": type(c).__name__,
-                    "platform": c.platform_name,
+                    "platform": c.source_name,
                     "detected": c.detect(Path("data")),
                 }
                 for c in connectors
@@ -357,6 +369,121 @@ def reembed():
         return {"ok": True, **result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# Upload
+# ---------------------------------------------------------------------------
+
+@app.post("/api/upload")
+async def upload_files(files: list[UploadFile]):
+    """Accept multipart JSON files and save each to the data/ directory."""
+    try:
+        data_dir = Path("data")
+        data_dir.mkdir(parents=True, exist_ok=True)
+        uploaded: list[str] = []
+        for f in files:
+            dest = data_dir / f.filename
+            content = await f.read()
+            dest.write_bytes(content)
+            uploaded.append(f.filename)
+        return {"uploaded": uploaded}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/upload/validate")
+def upload_validate():
+    """Run connector detection on the data/ directory."""
+    try:
+        connectors = get_connectors()
+        data_dir = Path("data")
+        for c in connectors:
+            if c.detect(data_dir):
+                return {"valid": True, "platform": c.source_name}
+        return {"valid": False, "platform": None}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# Ollama
+# ---------------------------------------------------------------------------
+
+@app.get("/api/ollama/status")
+def ollama_status():
+    """Check if Ollama is running and return available models."""
+    try:
+        resp = httpx.get("http://localhost:11434/api/tags", timeout=5.0)
+        resp.raise_for_status()
+        data = resp.json()
+        model_names = [m["name"] for m in data.get("models", [])]
+        return {"available": True, "models": model_names}
+    except Exception:
+        return {"available": False, "models": []}
+
+
+@app.post("/api/ollama/pull")
+def ollama_pull(model: str = Query(...)):
+    """Stream an Ollama model pull as SSE."""
+    def _stream():
+        with httpx.stream(
+            "POST",
+            "http://localhost:11434/api/pull",
+            json={"name": model},
+            timeout=None,
+        ) as resp:
+            for line in resp.iter_lines():
+                if line:
+                    yield f"data: {line}\n\n"
+    return StreamingResponse(_stream(), media_type="text/event-stream")
+
+
+# ---------------------------------------------------------------------------
+# Config
+# ---------------------------------------------------------------------------
+
+class ConfigRequest(BaseModel):
+    backend: str
+    model: str
+    api_key: str | None = None
+
+
+@app.post("/api/settings/config")
+def save_settings(body: ConfigRequest):
+    """Save LLM configuration via the config module."""
+    try:
+        cfg = load_config()
+        cfg.llm_backend = body.backend
+        if body.backend == "ollama":
+            cfg.ollama_model = body.model
+        else:
+            cfg.anthropic_model = body.model
+        if body.api_key is not None:
+            os.environ["ANTHROPIC_API_KEY"] = body.api_key
+        save_config(cfg)
+        # Also update the in-process active backend
+        global _active_backend
+        _active_backend = body.backend
+        return {"ok": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# Ingest & Embed aliases
+# ---------------------------------------------------------------------------
+
+@app.post("/api/ingest")
+def ingest():
+    """Alias for /api/settings/reimport."""
+    return reimport()
+
+
+@app.post("/api/embed")
+def embed():
+    """Alias for /api/settings/reembed."""
+    return reembed()
 
 
 # ---------------------------------------------------------------------------

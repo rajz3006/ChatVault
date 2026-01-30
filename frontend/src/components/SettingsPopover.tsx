@@ -6,14 +6,22 @@ interface Props {
 }
 
 export default function SettingsPopover({ onClose }: Props) {
-  const [settings, setSettings] = useState<Record<string, unknown> | null>(null);
   const [backend, setBackend] = useState("ollama");
+  const [ollamaModels, setOllamaModels] = useState<string[]>([]);
+  const [selectedModel, setSelectedModel] = useState("");
+  const [importStatus, setImportStatus] = useState<{ type: "loading" | "success" | "error"; msg: string } | null>(null);
+  const [embedStatus, setEmbedStatus] = useState<{ type: "loading" | "success" | "error"; msg: string } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     api.getSettings().then((s) => {
-      setSettings(s);
       if (typeof s.backend === "string") setBackend(s.backend);
+      if (typeof s.ollama_model === "string") setSelectedModel(s.ollama_model);
+    }).catch(() => {});
+    api.getOllamaStatus().then((status) => {
+      if (status.available && status.models.length > 0) {
+        setOllamaModels(status.models);
+      }
     }).catch(() => {});
   }, []);
 
@@ -36,6 +44,15 @@ export default function SettingsPopover({ onClose }: Props) {
     }
   };
 
+  const handleModelChange = async (model: string) => {
+    setSelectedModel(model);
+    try {
+      await api.saveConfig({ backend, model });
+    } catch {
+      // ignore
+    }
+  };
+
   return (
     <div className="settings-popover" ref={ref}>
       <h3 className="settings-title">Settings</h3>
@@ -52,33 +69,67 @@ export default function SettingsPopover({ onClose }: Props) {
         </select>
       </div>
 
-      <div className="settings-section">
-        <label className="settings-label">Connectors</label>
-        <div className="settings-info">
-          {settings ? (
-            <span>Active connectors: {String(settings.connectors ?? "claude")}</span>
-          ) : (
-            <span>Loading...</span>
-          )}
+      {backend === "ollama" && ollamaModels.length > 0 && (
+        <div className="settings-section">
+          <label className="settings-label">Ollama Model</label>
+          <select
+            className="settings-select"
+            value={selectedModel}
+            onChange={(e) => handleModelChange(e.target.value)}
+          >
+            {ollamaModels.map((m) => (
+              <option key={m} value={m}>{m}</option>
+            ))}
+          </select>
         </div>
-      </div>
+      )}
 
       <div className="settings-section">
         <label className="settings-label">Data</label>
-        <button className="settings-action-btn" onClick={() => {
-          fetch("/api/ingest", { method: "POST" }).catch(() => {});
-        }}>
-          Re-import Data
+        <button
+          className="settings-action-btn"
+          disabled={importStatus?.type === "loading"}
+          onClick={async () => {
+            setImportStatus({ type: "loading", msg: "Re-importing..." });
+            try {
+              const res = await fetch("/api/ingest", { method: "POST" });
+              if (!res.ok) throw new Error(await res.text());
+              const data = await res.json();
+              setImportStatus({ type: "success", msg: `Imported ${data.conversations} convs, ${data.messages} msgs` });
+            } catch (e: any) {
+              setImportStatus({ type: "error", msg: e.message || "Import failed" });
+            }
+          }}
+        >
+          {importStatus?.type === "loading" ? "Importing..." : "Re-import Data"}
         </button>
+        {importStatus && importStatus.type !== "loading" && (
+          <span className={`settings-status settings-status--${importStatus.type}`}>{importStatus.msg}</span>
+        )}
       </div>
 
       <div className="settings-section">
         <label className="settings-label">Vector Store</label>
-        <button className="settings-action-btn" onClick={() => {
-          fetch("/api/embed", { method: "POST" }).catch(() => {});
-        }}>
-          Re-embed Vectors
+        <button
+          className="settings-action-btn"
+          disabled={embedStatus?.type === "loading"}
+          onClick={async () => {
+            setEmbedStatus({ type: "loading", msg: "Re-embedding..." });
+            try {
+              const res = await fetch("/api/embed", { method: "POST" });
+              if (!res.ok) throw new Error(await res.text());
+              const data = await res.json();
+              setEmbedStatus({ type: "success", msg: `Embedded ${data.messages ?? 0} msg chunks, ${data.conversations ?? 0} conv chunks` });
+            } catch (e: any) {
+              setEmbedStatus({ type: "error", msg: e.message || "Embedding failed" });
+            }
+          }}
+        >
+          {embedStatus?.type === "loading" ? "Embedding..." : "Re-embed Vectors"}
         </button>
+        {embedStatus && embedStatus.type !== "loading" && (
+          <span className={`settings-status settings-status--${embedStatus.type}`}>{embedStatus.msg}</span>
+        )}
       </div>
     </div>
   );

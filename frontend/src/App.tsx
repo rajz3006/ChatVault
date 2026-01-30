@@ -3,6 +3,7 @@ import type { Conversation, Message, ChatMessage, Stats } from "./types";
 import * as api from "./api";
 import LeftPanel from "./components/LeftPanel";
 import RightPanel from "./components/RightPanel";
+import SetupWizard from "./components/SetupWizard";
 
 export default function App() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -10,11 +11,14 @@ export default function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [contentMatchUuids, setContentMatchUuids] = useState<Set<string>>(new Set());
+  const searchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [starredOnly, setStarredOnly] = useState(false);
   const [stats, setStats] = useState<Stats>({ conversations: 0, messages: 0, vectors: 0 });
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [showAiOverlay, setShowAiOverlay] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [setupDone, setSetupDone] = useState<boolean | null>(null);
 
   // Resizable left panel
   const [leftWidth, setLeftWidth] = useState(300);
@@ -63,7 +67,10 @@ export default function App() {
 
   useEffect(() => {
     fetchConversations();
-    api.getStats().then(setStats).catch(() => {});
+    api.getStats().then((s) => {
+      setStats(s);
+      setSetupDone(s.conversations > 0);
+    }).catch(() => {});
   }, [fetchConversations]);
 
   const handleSelect = useCallback(async (uuid: string) => {
@@ -136,11 +143,41 @@ export default function App() {
 
   const selectedConv = conversations.find((c) => c.uuid === selectedConvUuid) ?? null;
 
+  // Debounced keyword search for message content
+  useEffect(() => {
+    if (searchDebounce.current) clearTimeout(searchDebounce.current);
+    if (searchQuery.length < 2) {
+      setContentMatchUuids(new Set());
+      return;
+    }
+    searchDebounce.current = setTimeout(() => {
+      api.search(searchQuery, 20, "keyword").then((results) => {
+        setContentMatchUuids(new Set(results.map((r) => r.conversation_uuid)));
+      }).catch(() => setContentMatchUuids(new Set()));
+    }, 300);
+    return () => { if (searchDebounce.current) clearTimeout(searchDebounce.current); };
+  }, [searchQuery]);
+
   const filtered = searchQuery
     ? conversations.filter((c) =>
-        c.name.toLowerCase().includes(searchQuery.toLowerCase())
+        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contentMatchUuids.has(c.uuid)
       )
     : conversations;
+
+  if (setupDone === null) return null; // loading
+
+  if (!setupDone) {
+    return (
+      <SetupWizard
+        onComplete={() => {
+          setSetupDone(true);
+          fetchConversations();
+          api.getStats().then(setStats).catch(() => {});
+        }}
+      />
+    );
+  }
 
   return (
     <div className="app-layout">

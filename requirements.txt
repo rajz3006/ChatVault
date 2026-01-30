@@ -1,4 +1,6 @@
-streamlit>=1.30
+fastapi>=0.104
+uvicorn>=0.24
+httpx>=0.25
 chromadb>=0.4
 sentence-transformers>=2.2
 anthropic>=0.40

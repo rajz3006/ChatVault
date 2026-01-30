@@ -183,20 +183,20 @@ class EmbeddingEngine:
         return len(ids)
 
     def embed_messages(self, progress_callback: Callable[[int, int, str], None] | None = None) -> int:
-        """Create message-level embeddings for all assistant messages.
+        """Create message-level embeddings for all non-empty messages.
 
         Long messages are split into overlapping chunks.
 
         Returns:
             Number of newly embedded message chunks.
         """
-        # Fetch all assistant messages with conversation info
+        # Fetch all non-empty messages with conversation info
         rows = self.db.conn.execute("""
             SELECT m.uuid, m.conversation_uuid, m.sender, m.text, m.created_at,
                    c.name AS conversation_name, c.source_id
             FROM messages m
             JOIN conversations c ON m.conversation_uuid = c.uuid
-            WHERE m.sender = 'assistant' AND m.text IS NOT NULL AND m.text != ''
+            WHERE m.text IS NOT NULL AND m.text != ''
         """).fetchall()
 
         existing_ids = set(self.msg_collection.get()["ids"]) if self.msg_collection.count() > 0 else set()

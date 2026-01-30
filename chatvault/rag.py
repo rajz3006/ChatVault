@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -114,7 +115,11 @@ class RAGPipeline:
         for i, r in enumerate(results, start=1):
             header = f"[{i}] Conversation: {r.conversation_name or 'Untitled'}"
             if r.created_at:
-                header += f" ({r.created_at})"
+                try:
+                    dt = datetime.fromisoformat(r.created_at.replace("Z", "+00:00"))
+                    header += f" ({dt.strftime('%b %-d, %Y')})"
+                except (ValueError, AttributeError):
+                    header += f" ({r.created_at})"
             chunk = f"{header}\n{r.text[:1500]}"
             chunk_tokens = len(chunk) // 4
             if tokens_used + chunk_tokens > max_context_tokens:

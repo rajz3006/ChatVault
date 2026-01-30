@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Conversation, Message, ChatMessage, SearchResult } from "../types";
 import ThreadView from "./ThreadView";
@@ -21,9 +21,21 @@ interface Props {
   onClearAiChat: () => void;
 }
 
-function SourcesBlock({ sources }: { sources: SearchResult[] }) {
+function SourcesBlock({ sources, answer }: { sources: SearchResult[]; answer?: string }) {
   const [expanded, setExpanded] = useState(false);
   if (!sources || sources.length === 0) return null;
+
+  // Only show sources actually cited as [N] in the answer
+  let filtered = sources;
+  if (answer) {
+    const cited = new Set<number>();
+    for (const m of answer.matchAll(/\[(\d+)\]/g)) {
+      cited.add(parseInt(m[1], 10));
+    }
+    if (cited.size > 0) {
+      filtered = sources.filter((_, i) => cited.has(i + 1));
+    }
+  }
 
   return (
     <div className="ai-sources-block">
@@ -32,11 +44,11 @@ function SourcesBlock({ sources }: { sources: SearchResult[] }) {
         onClick={() => setExpanded((v) => !v)}
       >
         <span className="ai-sources-icon">{expanded ? "\u25BE" : "\u25B8"}</span>
-        <span>Sources ({sources.length})</span>
+        <span>Sources ({filtered.length})</span>
       </button>
       {expanded && (
         <ul className="ai-sources-list">
-          {sources.map((s, i) => (
+          {filtered.map((s, i) => (
             <li key={i} className="ai-source-item">
               <span className="ai-source-num">[{i + 1}]</span>
               <span className="ai-source-title">{s.conversation_name || "Untitled"}</span>
@@ -68,6 +80,11 @@ export default function RightPanel({
   onClearAiChat,
 }: Props) {
   const [showSettings, setShowSettings] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatHistory, isAiLoading]);
 
   return (
     <div className="right-panel">
@@ -147,7 +164,7 @@ export default function RightPanel({
                     <ReactMarkdown>{msg.content}</ReactMarkdown>
                   </div>
                   {msg.role === "assistant" && msg.sources && msg.sources.length > 0 && (
-                    <SourcesBlock sources={msg.sources} />
+                    <SourcesBlock sources={msg.sources} answer={msg.content} />
                   )}
                 </div>
               </div>
@@ -165,6 +182,7 @@ export default function RightPanel({
                 </div>
               </div>
             )}
+            <div ref={chatEndRef} />
           </div>
           <ChatInput onSend={onSend} disabled={isAiLoading} />
         </div>

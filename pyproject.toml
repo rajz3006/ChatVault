@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Open-source personal AI chat history assistant with RAG"
 requires-python = ">=3.10"
 dependencies = [
-    "streamlit",
+    "fastapi",
+    "uvicorn",
+    "httpx",
     "chromadb",
     "sentence-transformers",
     "anthropic",
@@ -21,7 +23,7 @@ dev = [
 ]
 
 [project.scripts]
-chatvault = "chatvault.app:main"
+chatvault = "chatvault.api:main"
 
 [build-system]
 requires = ["setuptools>=64"]

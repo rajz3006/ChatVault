@@ -35,7 +35,7 @@ body {
   background: var(--bg);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--text-1);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -171,7 +171,7 @@ body {
   padding: 9px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  font-size: 13px;
+  font-size: 14px;
   font-family: 'Inter', sans-serif;
   outline: none;
   background: var(--surface-alt);
@@ -233,7 +233,7 @@ body {
 }
 
 .date-group-header {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-3);
   text-transform: uppercase;
@@ -293,7 +293,7 @@ body {
 .conv-name {
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 450;
 }
 
@@ -301,13 +301,13 @@ body {
   padding: 32px 16px;
   color: var(--text-3);
   text-align: center;
-  font-size: 13px;
+  font-size: 14px;
   animation: fadeIn var(--transition-slow) ease;
 }
 
 .stats-footer {
   padding: 14px 20px;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   color: var(--text-3);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
@@ -357,7 +357,6 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden;
   flex: 1;
   min-width: 0;
   position: relative;
@@ -371,14 +370,14 @@ body {
   padding: 18px 24px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(240, 242, 236, 0.8);
+  background: var(--bg);
+  position: relative;
+  z-index: 100;
 }
 
 .right-title {
   margin: 0;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text-1);
   overflow: hidden;
@@ -396,7 +395,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   padding: 7px 16px;
-  font-size: 13px;
+  font-size: 14px;
   font-family: 'Inter', sans-serif;
   color: var(--text-2);
   cursor: pointer;
@@ -437,7 +436,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   padding: 6px 16px;
-  font-size: 13px;
+  font-size: 14px;
   font-family: 'Inter', sans-serif;
   color: var(--text-2);
   cursor: pointer;
@@ -468,7 +467,7 @@ body {
   padding: 6px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  font-size: 13px;
+  font-size: 14px;
   font-family: 'Inter', sans-serif;
   width: 120px;
   outline: none;
@@ -500,7 +499,7 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-2);
 }
 
@@ -523,7 +522,7 @@ body {
   padding: 6px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  font-size: 13px;
+  font-size: 14px;
   font-family: 'Inter', sans-serif;
   background: var(--surface);
   color: var(--text-2);
@@ -585,7 +584,7 @@ body {
 }
 
 .empty-sub {
-  font-size: 13px;
+  font-size: 14px;
   opacity: 0.8;
 }
 
@@ -657,20 +656,20 @@ body {
 }
 
 .chat-msg-sender {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-1);
   letter-spacing: -0.01em;
 }
 
 .chat-msg-time {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-3);
   font-weight: 400;
 }
 
 .chat-msg-content {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.7;
   color: var(--text-1);
   background: var(--surface);
@@ -701,7 +700,7 @@ body {
   padding: 16px 18px;
   border-radius: var(--radius-md);
   overflow-x: auto;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
   margin: 10px 0;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
@@ -717,7 +716,7 @@ body {
   border: 1px solid var(--border);
   padding: 2px 7px;
   border-radius: 6px;
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
   color: var(--accent-hover);
 }
@@ -878,7 +877,7 @@ body {
 }
 
 .ai-chat-header-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--accent);
   letter-spacing: -0.01em;
@@ -889,7 +888,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   padding: 5px 14px;
-  font-size: 13px;
+  font-size: 14px;
   font-family: 'Inter', sans-serif;
   color: var(--text-2);
   cursor: pointer;
@@ -954,7 +953,7 @@ body {
 }
 
 .ai-msg-sender {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--accent);
   margin-bottom: 4px;
@@ -962,7 +961,7 @@ body {
 }
 
 .ai-msg-content {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.7;
   color: var(--text-1);
   background: var(--surface);
@@ -994,14 +993,12 @@ body {
   right: 0;
   margin-top: 8px;
   width: 300px;
-  background: rgba(249, 250, 247, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: var(--surface-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 20px;
-  z-index: 100;
+  z-index: 1000;
   animation: slideDown 0.25s ease;
 }
 
@@ -1022,7 +1019,7 @@ body {
 
 .settings-label {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-3);
   text-transform: uppercase;
@@ -1035,7 +1032,7 @@ body {
   padding: 8px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 14px;
   font-family: 'Inter', sans-serif;
   background: var(--surface-solid);
   color: var(--text-1);
@@ -1050,7 +1047,7 @@ body {
 }
 
 .settings-info {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-2);
   line-height: 1.5;
 }
@@ -1060,7 +1057,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 8px 16px;
-  font-size: 13px;
+  font-size: 14px;
   font-family: 'Inter', sans-serif;
   color: var(--text-2);
   cursor: pointer;
@@ -1080,6 +1077,27 @@ body {
 
 .settings-action-btn:active {
   transform: translateY(0);
+}
+
+.settings-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.settings-status {
+  display: block;
+  font-size: 13px;
+  margin-top: 6px;
+  line-height: 1.3;
+}
+
+.settings-status--success {
+  color: var(--accent);
+}
+
+.settings-status--error {
+  color: #c0392b;
 }
 
 /* ---- Thinking Indicator ---- */
@@ -1197,4 +1215,397 @@ body {
   font-size: 0.72rem;
   margin-left: auto;
   flex-shrink: 0;
+}
+
+/* =======================================
+   Setup Wizard
+   ======================================= */
+
+/* 1. Wizard Overlay */
+.wizard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 42, 30, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* 2. Wizard Card */
+.wizard-card {
+  width: 100%;
+  max-width: 700px;
+  background: rgba(249, 250, 247, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 36px 40px;
+  animation: fadeInUp 0.45s ease both;
+}
+
+/* 3. Wizard Progress */
+.wizard-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 32px;
+}
+
+.wizard-progress-step {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--border);
+  border: 2px solid var(--border-strong);
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.wizard-progress-step.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(77, 138, 74, 0.15);
+}
+
+.wizard-progress-step.completed {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.wizard-progress-line {
+  width: 48px;
+  height: 2px;
+  background: var(--border);
+  transition: background var(--transition-base);
+}
+
+.wizard-progress-line.completed {
+  background: var(--accent);
+}
+
+/* 4. Wizard Step Content */
+.wizard-step-content {
+  min-height: 200px;
+  animation: fadeInUp 0.35s ease both;
+}
+
+/* 5. Platform Card */
+.platform-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--surface);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.platform-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.platform-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: var(--shadow-glow), var(--shadow-md);
+}
+
+.platform-card.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 6. Drop Zone */
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 24px;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-alt);
+  color: var(--text-3);
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+  box-shadow: var(--shadow-glow);
+}
+
+.drop-zone-icon {
+  font-size: 36px;
+  line-height: 1;
+  transition: transform var(--transition-base);
+}
+
+.drop-zone:hover .drop-zone-icon,
+.drop-zone.dragover .drop-zone-icon {
+  transform: translateY(-4px) scale(1.1);
+}
+
+.drop-zone-text {
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.drop-zone-hint {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* 7. LLM Card */
+.llm-card {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 14px;
+  padding: 18px 22px;
+  background: var(--surface);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.llm-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.llm-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: var(--shadow-glow), var(--shadow-md);
+}
+
+.llm-card-status {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--border-strong);
+  flex-shrink: 0;
+  transition: background var(--transition-base);
+}
+
+.llm-card-status.online {
+  background: var(--accent);
+  box-shadow: 0 0 6px rgba(77, 138, 74, 0.4);
+}
+
+.llm-card-status.offline {
+  background: #c0a060;
+}
+
+/* 7b. LLM Card — Model Select, Pull Button, Status */
+.llm-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.status-indicator {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.status-indicator.available {
+  color: var(--accent);
+  background: rgba(77, 138, 74, 0.12);
+}
+
+.status-indicator.unavailable {
+  color: #c0a060;
+  background: rgba(192, 160, 96, 0.12);
+}
+
+.model-select {
+  padding: 8px 14px;
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.model-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(77, 138, 74, 0.15);
+}
+
+.pull-model-btn {
+  padding: 8px 20px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.pull-model-btn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.pull-progress {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 4px 0;
+  width: 100%;
+}
+
+.api-key-input {
+  padding: 8px 14px;
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  width: 100%;
+  max-width: 360px;
+}
+
+.api-key-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(77, 138, 74, 0.15);
+}
+
+/* 8. Import Progress Bar */
+.import-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--surface-alt);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.import-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: var(--radius-full);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 9. Wizard Nav */
+.wizard-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.wizard-btn {
+  padding: 10px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: var(--surface-solid);
+  color: var(--text-2);
+  box-shadow: var(--shadow-sm);
+}
+
+.wizard-btn:hover {
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+  color: var(--text-1);
+}
+
+.wizard-btn.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  border: none;
+  box-shadow: 0 2px 10px rgba(77, 138, 74, 0.3);
+}
+
+.wizard-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(77, 138, 74, 0.4);
+  color: white;
+}
+
+.wizard-btn.skip {
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  box-shadow: none;
+}
+
+.wizard-btn.skip:hover {
+  color: var(--text-2);
+  background: transparent;
+  box-shadow: none;
+}
+
+.wizard-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 10. Wizard Title / Subtitle */
+.wizard-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -0.02em;
+}
+
+.wizard-subtitle {
+  margin: 0 0 24px;
+  font-size: 14px;
+  color: var(--text-3);
+  font-weight: 400;
+  line-height: 1.5;
 }

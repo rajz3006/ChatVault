@@ -40,9 +40,10 @@ export async function getTags(uuid: string): Promise<{ id: number; name: string 
   return request<{ id: number; name: string }[]>(`/conversations/${uuid}/tags`);
 }
 
-export async function search(query: string, n?: number): Promise<SearchResult[]> {
+export async function search(query: string, n?: number, mode?: "hybrid" | "keyword"): Promise<SearchResult[]> {
   const params = new URLSearchParams({ q: query });
   if (n !== undefined) params.set("n", String(n));
+  if (mode) params.set("mode", mode);
   return request<SearchResult[]>(`/search?${params}`);
 }
 
@@ -76,5 +77,89 @@ export async function setBackend(name: string): Promise<void> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ backend: name }),
+  });
+}
+
+export async function ingest(): Promise<{ conversations: number; messages: number }> {
+  return request<{ conversations: number; messages: number }>("/ingest", {
+    method: "POST",
+  });
+}
+
+export async function embed(): Promise<{ embedded: number }> {
+  return request<{ embedded: number }>("/embed", {
+    method: "POST",
+  });
+}
+
+export async function uploadFiles(files: File[]): Promise<{ uploaded: string[] }> {
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append("files", file);
+  }
+  return request<{ uploaded: string[] }>("/upload", {
+    method: "POST",
+    body: formData,
+  });
+}
+
+export async function validateUpload(): Promise<{ valid: boolean; platform: string | null }> {
+  return request<{ valid: boolean; platform: string | null }>("/upload/validate", {
+    method: "POST",
+  });
+}
+
+export async function getOllamaStatus(): Promise<{ available: boolean; models: string[] }> {
+  return request<{ available: boolean; models: string[] }>("/ollama/status");
+}
+
+export async function pullOllamaModel(
+  model: string,
+  onProgress: (status: string) => void
+): Promise<void> {
+  const res = await fetch(`${BASE}/ollama/pull?model=${encodeURIComponent(model)}`, {
+    method: "POST",
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`API ${res.status}: ${body}`);
+  }
+  const reader = res.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop()!;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      const jsonStr = trimmed.startsWith("data: ") ? trimmed.slice(6) : trimmed;
+      try {
+        const parsed = JSON.parse(jsonStr);
+        onProgress(parsed.status);
+      } catch { /* skip non-JSON lines */ }
+    }
+  }
+  if (buffer.trim()) {
+    const jsonStr = buffer.trim().startsWith("data: ") ? buffer.trim().slice(6) : buffer.trim();
+    try {
+      const parsed = JSON.parse(jsonStr);
+      onProgress(parsed.status);
+    } catch { /* skip */ }
+  }
+}
+
+export async function saveConfig(config: {
+  backend: string;
+  model: string;
+  api_key?: string;
+}): Promise<{ ok: boolean }> {
+  return request<{ ok: boolean }>("/settings/config", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(config),
   });
 }

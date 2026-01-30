@@ -24,80 +24,51 @@
 
 ### Prerequisites
 
-- **Python 3.12+** ([download](https://www.python.org/downloads/))
+- **Python 3.10+** ([download](https://www.python.org/downloads/))
 - **Node.js 18+** ([download](https://nodejs.org/))
-- **Ollama** (for local LLM) — or an Anthropic API key for Claude
+- **Ollama** (optional, for local LLM) — or an Anthropic API key for Claude
 
-Install Ollama:
-
-```bash
-brew install ollama   # macOS
-ollama serve          # start the server (keep running in a separate terminal)
-```
-
-### 1. Clone the repo
+### 1. Clone and run
 
 ```bash
 git clone https://github.com/your-username/chatvault.git
 cd chatvault
+chmod +x run.sh
+./run.sh
 ```
 
-### 2. Start the backend (FastAPI)
+### 2. Open in your browser
+
+```
+http://localhost:8000
+```
+
+That's it. `run.sh` handles everything: Python venv, dependencies, frontend build, embedding model download, and server launch. On first run the setup wizard will guide you through importing your data and configuring the LLM backend.
+
+<details>
+<summary><strong>Development setup (manual)</strong></summary>
+
+If you prefer to run the backend and frontend separately for development:
 
 ```bash
-# Create and activate virtual environment
+# Backend
 python3 -m venv .venv
 source .venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
 pip install -e .
-
-# Place your AI chat export JSON files in data/
-mkdir -p data
-# Copy your Claude export files into data/
-
-# Run ingestion and embeddings (first time only)
-python -m chatvault.ingest
-python -m chatvault.embeddings
-
-# Start the FastAPI server
 python -m chatvault.api
 ```
 
-The API server starts at **http://localhost:8000**.
-
-### 3. Start the frontend (React + Vite)
-
-Open a new terminal:
-
 ```bash
+# Frontend (separate terminal)
 cd frontend
 npm install
 npm run dev
 ```
 
-The React dev server starts at **http://localhost:5173** with API requests proxied to `:8000`.
+The Vite dev server runs at `http://localhost:5173` with API requests proxied to `:8000`.
 
-### Production build (single server)
-
-```bash
-cd frontend
-npm run build        # builds to frontend/dist/
-cd ..
-python -m chatvault.api   # serves both API and frontend on :8000
-```
-
-### Alternative: One-command start with `run.sh`
-
-For the Streamlit-based UI (legacy), you can also run:
-
-```bash
-chmod +x run.sh
-./run.sh
-```
-
-This handles venv creation, dependency install, embedding model download, and launches the Streamlit UI at **http://localhost:8502**. A setup wizard walks you through first-time configuration.
+</details>
 
 ---
 
@@ -182,8 +153,7 @@ chatvault/
 ├── rag.py               # RAG pipeline
 ├── export.py            # Conversation export (MD/JSON/CSV)
 ├── config.py            # YAML config management
-├── onboarding.py        # First-run setup wizard (Streamlit)
-└── app.py               # Streamlit UI (legacy)
+├── api.py               # FastAPI backend
 
 frontend/                # React + Vite + TypeScript
 ├── src/
@@ -272,59 +242,32 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 | Issue | Fix |
 |-------|-----|
-| `Python 3.12+ is required` | Install Python 3.12+ from [python.org](https://www.python.org/downloads/) or `brew install python@3.12` |
+| `Python 3.10+ is required` | Install Python 3.10+ from [python.org](https://www.python.org/downloads/) or `brew install python@3.10` |
 | `Ollama is not running` | Run `ollama serve` in a separate terminal |
 | Embedding model download hangs | Check your internet connection; the model (~80 MB) downloads from HuggingFace on first run |
 | Import fails | Ensure your export files are unzipped JSON in the `data/` directory |
-| Frontend can't reach API | Make sure the FastAPI server is running on `:8000` before starting the frontend dev server |
+| Frontend not loading | Run `./run.sh` which builds the frontend automatically; for dev mode ensure both servers are running |
 | `npm run build` fails | Run `npm install` first; ensure Node.js 18+ is installed |
 
 ---
+
+## Stopping the Server
+
+```bash
+./stop.sh
+```
+
+Or press `Ctrl+C` in the terminal where `run.sh` is running.
 
 ## Fresh Restart (Clean DB & Cache)
 
 To wipe all ingested data and start from scratch:
 
-### 1. Stop both servers
-
 ```bash
-# Kill FastAPI backend and Vite frontend
-kill $(lsof -ti:8000) $(lsof -ti:5173) 2>/dev/null
+./run.sh --reset
 ```
 
-### 2. Delete database and vector store
-
-```bash
-# SQLite database
-rm -f chatvault.db chatvault.db-shm chatvault.db-wal
-
-# ChromaDB vector store
-rm -rf chroma_data/
-
-# (Optional) Remove saved config to re-trigger the setup wizard
-rm -f ~/.chatvault/config.yaml
-```
-
-### 3. Re-ingest and restart
-
-```bash
-# Activate venv
-source .venv/bin/activate
-
-# Re-run ingestion from data/ directory
-python -m chatvault.ingest
-
-# Re-generate embeddings
-python -m chatvault.embeddings
-
-# Start backend
-python -m chatvault.api &
-
-# Start frontend (in another terminal)
-cd frontend && npm run dev
-```
-
-> **Note:** The FastAPI backend holds data in memory via lazy singletons. Deleting files on disk while the server is running will not take effect — you must restart the server.
+This deletes the database, vector store, and config, then relaunches with the setup wizard.
 
 ---
 

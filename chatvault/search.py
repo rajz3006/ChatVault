@@ -99,10 +99,9 @@ class SearchEngine:
         Returns:
             List of SearchResult sorted by FTS5 rank.
         """
-        # Escape special FTS5 characters and build a simple query
-        fts_query = " OR ".join(
-            word for word in query.split() if word.strip()
-        )
+        # Build FTS5 query scoped to the text column only
+        words = [word for word in query.split() if word.strip()]
+        fts_query = " OR ".join(f"text:{word}" for word in words)
         if not fts_query:
             return []
 
